@@ -28,5 +28,9 @@ class App
     {
         echo $this->view->render("cart", []);
     }
+    public function ocorrencia (array $data)
+    {
+        echo $this->view->render("ocorrencia", []);
+    }
 
 }

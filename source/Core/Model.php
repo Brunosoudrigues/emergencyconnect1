@@ -7,56 +7,60 @@ use PDOException;
 
 abstract class Model
 {
-
     protected $entity;
-
-    private $massage;
+    private $message;
 
     public function getMessage(): ?string
     {
-        return $this->massage;
+        return $this->message;
     }
 
-    public function selectAll (): ?array
+    public function selectAll(): ?array
     {
         $conn = Connect::getInstance();
         $query = "SELECT * FROM {$this->entity}";
         return $conn->query($query)->fetchAll();
     }
 
-    public function selectById (int $id): ?object
+    public function selectById(int $id): ?object
     {
         $conn = Connect::getInstance();
         $query = "SELECT * 
                   FROM {$this->entity}
-                  WHERE id = {$id}";
-        return $conn->query($query)->fetch();
+                  WHERE id = :id";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
+
     public function insert(): ?int
     {
-        $values = get_object_vars($this);// pegar os valores dos atributos e inserir em um arra
-        array_shift($values);
-        array_shift($values);
+        $values = get_object_vars($this); // Pega os valores dos atributos do objeto
+        unset($values['entity'], $values['message']); // Remove propriedades indesejadas
 
-        foreach ($values as $key => $value){
-            echo "{$value} => {$key} <br>";
-            $values[$key] = is_null($value) ? "NULL" : "'{$value}'";
-        }
+        $columns = array_keys($values);
+        $placeholders = array_map(fn($col) => ":{$col}", $columns);
 
-        $valuesString = implode(",", $values);
+        $columnsString = implode(", ", $columns);
+        $placeholdersString = implode(", ", $placeholders);
 
         $conn = Connect::getInstance();
-        $query = "INSERT INTO {$this->entity} VALUES ({$valuesString})";
+        $query = "INSERT INTO {$this->entity} ({$columnsString}) VALUES ({$placeholdersString})";
+        $stmt = $conn->prepare($query);
 
-        try {
-            $result = $conn->query($query);
-            $this->massage = "Registro inserido com sucesso!";
-            return $result ? $conn->lastInsertId() : null;
-        } catch (PDOException $exception) {
-            $this->massage = "Erro ao inserir: {$exception->getMessage()}";
-            return false;
+        foreach ($values as $key => $value) {
+            $stmt->bindValue(":{$key}", $value);
         }
 
+        try {
+            $stmt->execute();
+            $this->message = "Registro inserido com sucesso!";
+            return $conn->lastInsertId();
+        } catch (PDOException $exception) {
+            $this->message = "Erro ao inserir: {$exception->getMessage()}";
+            return false;
+        }
     }
-
 }
+    

@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-    const faqs = document.querySelectorAll('.faq');
+document.addEventListener("DOMContentLoaded", function() {
+    // Seleciona todas as perguntas da FAQ
+    const faqQuestions = document.querySelectorAll(".faq-question");
 
-    faqs.forEach((faq) => {
-        const question = faq.querySelector('.faq-question');
-        const answer = faq.querySelector('.faq-answer');
-
-        question.addEventListener('click', (event) => {
-            const isAnswerVisible = getComputedStyle(answer).display !== 'none';
-            answer.style.display = isAnswerVisible ? 'none' : 'block';
+    // Adiciona um evento de clique a cada pergunta
+    faqQuestions.forEach(question => {
+        question.addEventListener("click", () => {
+            // Alterna a classe 'active' para mostrar/ocultar a resposta
+            const faq = question.parentElement;
+            faq.classList.toggle("active");
         });
     });
 });

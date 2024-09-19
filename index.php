@@ -18,13 +18,15 @@ $route->get("/carrinho-compras","Web:cart");
 $route->get("/servicos","Web:services");
 $route->get("/faqs","Web:faqs");
 $route->get("/login","Web:login");
+$route->get("/register","Web:register");
 
 // Rotas amigáveis da área restrita
 $route->group("/app");
 
 $route->get("/", "App:home");
 $route->get("/perfil", "App:profile");
-$route->get("/carrinho", "App:cart");
+$route->get("/primeirosocorros", "App:cart");
+$route->get("/ocorrencias", "App:ocorrencia");
 
 $route->group(null);
 

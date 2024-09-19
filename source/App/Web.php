@@ -37,6 +37,11 @@ class Web
     {
         echo $this->view->render("login",[]);
     }
+    public function register()
+    {
+       
+        echo $this ->view -> render ("register");
+    }
 
     public function location ()
     {

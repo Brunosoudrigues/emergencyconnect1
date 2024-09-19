@@ -1,11 +1,9 @@
 <?php
 
 namespace Source\Core;
-// depois retirar a linha abaixo
-//require __DIR__ . "/../Boot/Config.php";
 
-use \PDO;
-use \PDOException;
+use PDO;
+use PDOException;
 
 class Connect
 {
@@ -16,11 +14,11 @@ class Connect
         PDO::ATTR_CASE => PDO::CASE_NATURAL
     ];
 
-    private static $instance;
+    private static ?PDO $instance = null;
 
     public static function getInstance(): ?PDO
     {
-        if (empty(self::$instance)) {
+        if (self::$instance === null) {
             try {
                 self::$instance = new PDO(
                     "mysql:host=" . CONF_DB_HOST . ";dbname=" . CONF_DB_NAME,
@@ -29,9 +27,9 @@ class Connect
                     self::OPTIONS
                 );
             } catch (PDOException $exception) {
-                //redirect("/ops/problemas");
+                // Em produção, redirecione para uma página de erro ou registre o erro em um log
                 echo "Problemas ao Conectar...";
-                echo $exception->getMessage();
+                error_log($exception->getMessage()); // Registra o erro em um arquivo de log
             }
         }
 
@@ -40,9 +38,11 @@ class Connect
 
     final private function __construct()
     {
+        // Impede a criação de uma nova instância via construtor
     }
 
     private function __clone()
     {
+        // Impede a clonagem da instância
     }
 }
